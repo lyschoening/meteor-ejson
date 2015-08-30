@@ -4,6 +4,7 @@ import ejson
 
 import unittest
 
+from collections import OrderedDict
 
 class EJSONTestCase(unittest.TestCase):
     def test_escape_encode(self):
@@ -78,6 +79,10 @@ class EJSONTestCase(unittest.TestCase):
                          }, decoder.decode('{"foo": [{"$type": "pow", "$value": 5}, 1.23],'
                                            ' "things": {"$type": "set", "$value": [1, 1, 2, 4]}}'))
 
+    def test_ordered_dict(self):
+        ordered_dict = OrderedDict([(4, 'text 1'), (1, 'text 2'), (23, 'text 3')])
+        json_ordered_dump = ejson.dumps(ordered_dict)
+        self.assertEqual('{"4": "text 1", "1": "text 2", "23": "text 3"}', json_ordered_dump)
 
 if __name__ == '__main__':
     unittest.main()

@@ -3,7 +3,7 @@ import calendar
 from datetime import date, datetime
 import json
 import six
-
+from collections import OrderedDict
 EJSON_KEYWORDS = ("$date", "$type", "$value", "$escape", "$binary")
 
 try:
@@ -52,7 +52,14 @@ class EJSONEncoder(json.JSONEncoder):
                         raise ValueError("Circular reference detected")
                     markers[marker_id] = o
                 try:
-                    if isinstance(o, dict):
+                    if isinstance(o, OrderedDict):
+                        if any(kw in o for kw in EJSON_KEYWORDS):
+                            return {"$escape": {k: _encode(v) for k, v in o.items()}}
+                        ordered_tuples_list = []
+                        for k, v in o.items():
+                            ordered_tuples_list.append((k, _encode(v)))
+                        return OrderedDict(ordered_tuples_list)
+                    elif isinstance(o, dict):
                         if any(kw in o for kw in EJSON_KEYWORDS):
                             return {"$escape": {k: _encode(v) for k, v in o.items()}}
                         return {k: _encode(v) for k, v in o.items()}
