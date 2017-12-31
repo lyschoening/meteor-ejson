@@ -101,6 +101,8 @@ class EJSONDecoder(json.JSONDecoder):
                 if "$escape" in o:
                     return self._decode_escaped(o['$escape'])
                 if "$date" in o:
+                    if o["$date"] is None:
+                        return None
                     return datetime.fromtimestamp(o["$date"] / 1000.0, timezone.utc)
                 if "$binary" in o:
                     return b64decode(o['$binary'])
